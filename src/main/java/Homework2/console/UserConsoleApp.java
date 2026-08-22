@@ -1,8 +1,8 @@
 package Homework2.console;
 
-import Homework2.dao.UserDao;
 import Homework2.entity.User;
 import Homework2.exception.DaoException;
+import Homework2.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,11 +13,11 @@ public class UserConsoleApp {
 
     private static final Logger log = LoggerFactory.getLogger(UserConsoleApp.class);
 
-    private final UserDao userDao;
+    private final UserService userService;
     private final ConsoleInputReader input;
 
-    public UserConsoleApp(UserDao userDao, ConsoleInputReader input) {
-        this.userDao = userDao;
+    public UserConsoleApp(UserService userService, ConsoleInputReader input) {
+        this.userService = userService;
         this.input = input;
     }
 
@@ -62,18 +62,18 @@ public class UserConsoleApp {
         String email = input.readNonBlank("Email: ");
         Integer age = input.readPositiveInt("Возраст: ");
 
-        User created = userDao.create(new User(name, email, age));
+        User created = userService.createUser(name, email, age);
         System.out.println("Создан: " + created);
     }
 
     private void findUserById() {
         Long id = input.readLong("ID: ");
-        Optional<User> user = userDao.findById(id);
+        Optional<User> user = userService.getUserById(id);
         System.out.println(user.isPresent() ? user.get() : "Пользователь с id=" + id + " не найден.");
     }
 
     private void printAllUsers() {
-        List<User> users = userDao.findAll();
+        List<User> users = userService.getAllUsers();
         if (users.isEmpty()) {
             System.out.println("Пользователей пока нет.");
             return;
@@ -83,7 +83,7 @@ public class UserConsoleApp {
 
     private void updateUser() {
         Long id = input.readLong("ID пользователя для обновления: ");
-        Optional<User> found = userDao.findById(id);
+        Optional<User> found = userService.getUserById(id);
         if (found.isEmpty()) {
             System.out.println("Пользователь с id=" + id + " не найден.");
             return;
@@ -93,31 +93,25 @@ public class UserConsoleApp {
         System.out.println("Текущие данные: " + user);
 
         String name = input.readLine("Новое имя [" + user.getName() + "]: ");
-        if (!name.isEmpty()) {
-            user.setName(name);
-        }
-
         String email = input.readLine("Новый email [" + user.getEmail() + "]: ");
-        if (!email.isEmpty()) {
-            user.setEmail(email);
-        }
-
         String ageInput = input.readLine("Новый возраст [" + user.getAge() + "]: ");
+
+        Integer age = null;
         if (!ageInput.isEmpty()) {
             try {
-                user.setAge(Integer.parseInt(ageInput));
+                age = Integer.parseInt(ageInput);
             } catch (NumberFormatException e) {
                 System.out.println("Некорректный возраст, значение оставлено без изменений.");
             }
         }
 
-        User updated = userDao.update(user);
+        User updated = userService.updateUser(id, name, email, age);
         System.out.println("Обновлён: " + updated);
     }
 
     private void deleteUser() {
         Long id = input.readLong("ID пользователя для удаления: ");
-        boolean deleted = userDao.delete(id);
+        boolean deleted = userService.deleteUser(id);
         System.out.println(deleted ? "Пользователь удалён." : "Пользователь с id=" + id + " не найден.");
     }
 }
