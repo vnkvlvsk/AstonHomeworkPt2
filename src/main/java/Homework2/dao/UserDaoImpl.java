@@ -2,7 +2,6 @@ package Homework2.dao;
 
 import Homework2.entity.User;
 import Homework2.exception.DaoException;
-import Homework2.util.HibernateUtil;
 import org.hibernate.*;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
@@ -17,8 +16,8 @@ public class UserDaoImpl implements UserDao {
 
     private final SessionFactory sessionFactory;
 
-    public UserDaoImpl() {
-        this.sessionFactory = HibernateUtil.getSessionFactory();
+    public UserDaoImpl(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
     }
 
     @Override
