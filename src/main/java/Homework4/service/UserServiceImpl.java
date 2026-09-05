@@ -1,6 +1,8 @@
 package Homework4.service;
 
 import Homework4.entity.User;
+import Homework4.event.OperationType;
+import Homework4.event.UserEventPublisher;
 import Homework4.exception.DuplicateEmailException;
 import Homework4.exception.UserNotFoundException;
 import Homework4.repository.UserRepository;
@@ -13,18 +15,23 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final UserEventPublisher eventPublisher;
 
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, UserEventPublisher eventPublisher) {
         this.userRepository = userRepository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
     public User createUser(User user) {
+        User saved;
         try {
-            return userRepository.save(user);
+            saved = userRepository.save(user);
         } catch (DataIntegrityViolationException e) {
             throw new DuplicateEmailException("Пользователь с email '" + user.getEmail() + "' уже существует");
         }
+        eventPublisher.publish(OperationType.CREATED, saved.getEmail());
+        return saved;
     }
 
     @Override
@@ -56,9 +63,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new UserNotFoundException("Пользователь с id=" + id + " не найден");
-        }
+        User existing = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с id=" + id + " не найден"));
         userRepository.deleteById(id);
+        eventPublisher.publish(OperationType.DELETED, existing.getEmail());
     }
 }
