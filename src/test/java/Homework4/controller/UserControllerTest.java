@@ -1,5 +1,6 @@
 package Homework4.controller;
 
+import Homework4.assembler.UserModelAssembler;
 import Homework4.dto.UserRequest;
 import Homework4.entity.User;
 import Homework4.exception.DuplicateEmailException;
@@ -116,7 +117,9 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("Ivan"))
-                .andExpect(jsonPath("$.createdAt").value("2026-01-01T12:00:00"));
+                .andExpect(jsonPath("$.createdAt").value("2026-01-01T12:00:00"))
+                .andExpect(jsonPath("$._links.self.href").value("http://localhost/api/users/1"))
+                .andExpect(jsonPath("$._links.users.href").value("http://localhost/api/users"));
     }
 
     @Test
@@ -137,9 +140,12 @@ class UserControllerTest {
 
         mockMvc.perform(get("/api/users"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].name").value("A"))
-                .andExpect(jsonPath("$[1].name").value("B"));
+                .andExpect(jsonPath("$._links.self.href").value("http://localhost/api/users"))
+                .andExpect(jsonPath("$._embedded.userResponseList.length()").value(2))
+                .andExpect(jsonPath("$._embedded.userResponseList[0].name").value("A"))
+                .andExpect(jsonPath("$._embedded.userResponseList[0]._links.self.href")
+                        .value("http://localhost/api/users/1"))
+                .andExpect(jsonPath("$._embedded.userResponseList[1].name").value("B"));
     }
 
     @Test
@@ -148,7 +154,8 @@ class UserControllerTest {
 
         mockMvc.perform(get("/api/users"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(0));
+                .andExpect(jsonPath("$._links.self.href").value("http://localhost/api/users"))
+                .andExpect(jsonPath("$._embedded").doesNotExist());
     }
 
     @Test
@@ -163,7 +170,8 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("NewName"))
                 .andExpect(jsonPath("$.email").value("new@example.com"))
-                .andExpect(jsonPath("$.age").value(40));
+                .andExpect(jsonPath("$.age").value(40))
+                .andExpect(jsonPath("$._links.self.href").value("http://localhost/api/users/1"));
     }
 
     @Test
