@@ -1,4 +1,4 @@
-package ApiGateway;
+package gateway;
 
 import com.sun.net.httpserver.HttpServer;
 import org.junit.jupiter.api.AfterAll;

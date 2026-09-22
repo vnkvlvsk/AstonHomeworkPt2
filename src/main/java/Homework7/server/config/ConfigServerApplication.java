@@ -1,23 +1,23 @@
-package DiscoveryServer;
+package Homework7.server.config;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
-import org.springframework.cloud.netflix.eureka.server.EnableEurekaServer;
+import org.springframework.cloud.config.server.EnableConfigServer;
 
-@EnableEurekaServer
+@EnableConfigServer
 @SpringBootApplication(exclude = {
         DataSourceAutoConfiguration.class,
         DataSourceTransactionManagerAutoConfiguration.class,
         HibernateJpaAutoConfiguration.class
 })
-public class DiscoveryServerApplication {
+public class ConfigServerApplication {
 
     public static void main(String[] args) {
-        SpringApplication app = new SpringApplication(DiscoveryServerApplication.class);
-        app.setAdditionalProfiles("discovery-server");
+        SpringApplication app = new SpringApplication(ConfigServerApplication.class);
+        app.setAdditionalProfiles("config-server", "native");
         app.run(args);
     }
 }
