@@ -43,7 +43,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         properties = {
                 "spring.profiles.active=notification-service",
-                "spring.mail.port=3025"
+                "spring.mail.port=3025",
+                "eureka.client.enabled=false",
+                "spring.cloud.config.enabled=false"
         }
 )
 class NotificationServiceIT {
