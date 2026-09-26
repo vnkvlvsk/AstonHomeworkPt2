@@ -1,0 +1,10 @@
+target/
+.git/
+.idea/
+*.iml
+
+# Local secrets: never bake a developer's local DB/SMTP credentials into the image.
+# The Docker build must work from a clean checkout using only compose-supplied env vars.
+src/main/resources/hibernate.cfg.xml
+src/main/resources/application.properties
+src/main/resources/application-notification-service.properties
